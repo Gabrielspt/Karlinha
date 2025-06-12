@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz Íntimo do Nosso Amor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff1493 0%, #9400d3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            color: white;
+            touch-action: manipulation;
+        }
+        
+        .quiz-container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        h1 {
+            color: #ff69b4;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(255,105,180,0.5);
+        }
+        
+        .warning {
+            background: rgba(255,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ff4757;
+            font-size: 0.9rem;
+        }
+        
+        .question {
+            font-size: 1.1rem;
+            margin: 20px 0;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+            padding: 0 5px;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #ff69b4;
+            border-radius: 30px;
+            padding: 12px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .option:active {
+            background: rgba(255,105,180,0.3);
+            transform: scale(0.98);
+        }
+        
+        .next-btn {
+            background: linear-gradient(90deg, #ff1493, #9400d3);
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 15px;
+            width: 100%;
+            max-width: 200px;
+        }
+        
+        .next-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .result {
+            display: none;
+            animation: fadeIn 1s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .heart {
+            position: absolute;
+            font-size: 16px;
+            color: rgba(255, 20, 147, 0.7);
+            animation: fall 10s linear infinite;
+        }
+        
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Melhorias para telas muito pequenas */
+        @media (max-width: 400px) {
+            .quiz-container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .question {
+                font-size: 1rem;
+                min-height: 50px;
+            }
+            
+            .option {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+            
+            .next-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" id="hearts"></div>
+    
+    <div class="quiz-container">
+        <h1><i class="fas fa-lock"></i> Quiz Íntimo</h1>
+        
+        <div class="warning">
+            <i class="fas fa-exclamation-triangle"></i> Esse quiz contém perguntas pessoais - apenas para nós dois!
+        </div>
+        
+        <div class="question" id="question"></div>
+        
+        <div class="options" id="options"></div>
+        
+        <button class="next-btn" id="next-btn">Próxima <i class="fas fa-heart"></i></button>
+        
+        <div class="result" id="result">
+            <h2>Nossa Intimidade: <span id="score">0</span>/5</h2>
+            <p id="result-message"></p>
+            <button onclick="window.location.href='beijo.html'" class="next-btn">
+                <i class="fas fa-kiss-wink-heart"></i> Continuar para a Surpresa
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Perguntas íntimas (personalize com suas respostas)
+        const questions = [
+            {
+                question: "Qual foi o momento mais sensual que vivemos juntos?",
+                options: ["Quando transamos a noite toda", "Nosso banho juntos", "Quando dançamos lentamente", "Outro momento"],
+                answer: 0
+            },
+            {
+                question: "O que mais me excita em você?",
+                options: ["Seu olhar", "Seu toque", "Seus beijos", "Sua confiança"],
+                answer: 1
+            },
+            {
+                question: "Qual minha fantasia secreta que você conhece?",
+                options: ["Fazer em local público", "Experimentar novas posições", "Usar lingerie especial", "Fazer uma surpresa"],
+                answer: 2
+            },
+            {
+                question: "Qual parte do meu corpo você mais gosta de beijar?",
+                options: ["Pescoço", "Boca", "Coxas", "Outra parte"],
+                answer: 1
+            },
+            {
+                question: "O que eu faço que te deixa mais animado(a)?",
+                options: ["Meus beijos de leve", "Quando sussurro no seu ouvido", "Meus toques suaves", "Quando tomo iniciativa"],
+                answer: 0
+            }
+        ];
+
+        // Variáveis do quiz
+        let currentQuestion = 0;
+        let score = 0;
+        const questionElement = document.getElementById('question');
+        const optionsElement = document.getElementById('options');
+        const nextButton = document.getElementById('next-btn');
+        const resultElement = document.getElementById('result');
+        const scoreElement = document.getElementById('score');
+        const resultMessage = document.getElementById('result-message');
+
+        // Carrega pergunta
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            questionElement.textContent = q.question;
+            
+            optionsElement.innerHTML = '';
+            q.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add('option');
+                
+                // Eventos para mobile (touch) e desktop (click)
+                button.addEventListener('click', () => selectAnswer(index));
+                button.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    selectAnswer(index);
+                });
+                
+                optionsElement.appendChild(button);
+            });
+            
+            nextButton.style.display = 'none';
+        }
+
+        // Seleciona resposta
+        function selectAnswer(index) {
+            const options = document.querySelectorAll('.option');
+            const correctIndex = questions[currentQuestion].answer;
+            
+            options.forEach(option => {
+                option.style.pointerEvents = 'none';
+            });
+            
+            if (index === correctIndex) {
+                options[index].style.background = 'rgba(0,255,0,0.3)';
+                options[index].style.borderColor = '#4CAF50';
+                score++;
+            } else {
+                options[index].style.background = 'rgba(255,0,0,0.3)';
+                options[index].style.borderColor = '#f44336';
+                options[correctIndex].style.background = 'rgba(0,255,0,0.3)';
+                options[correctIndex].style.borderColor = '#4CAF50';
+            }
+            
+            nextButton.style.display = 'block';
+        }
+
+        // Próxima pergunta
+        nextButton.addEventListener('click', () => {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        });
+
+        // Mostra resultado
+        function showResult() {
+            questionElement.style.display = 'none';
+            optionsElement.style.display = 'none';
+            nextButton.style.display = 'none';
+            
+            scoreElement.textContent = score;
+            
+            if (score >= 4) {
+                resultMessage.textContent = "Você me conhece intimamente... que delícia! 😍";
+            } else if (score >= 2) {
+                resultMessage.textContent = "Você me conhece bem, mas podemos nos explorar mais... 😘";
+            } else {
+                resultMessage.textContent = "Precisamos nos conhecer melhor... eu adoraria! 💕";
+            }
+            
+            resultElement.style.display = 'block';
+        }
+
+        // Corações animados (otimizado para mobile)
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartCount = window.innerWidth < 600 ? 15 : 20;
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤';
+                heart.classList.add('heart');
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = 5 + Math.random() * 10 + 's';
+                heart.style.fontSize = (8 + Math.random() * 16) + 'px';
+                heart.style.opacity = Math.random() * 0.7 + 0.3;
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heartsContainer.appendChild(heart);
+            }
+        }
+
+        // Inicia
+        loadQuestion();
+        createHearts();
+        
+        // Evita zoom indesejado em double-tap
+        document.addEventListener('dblclick', function(e) {
+            e.preventDefault();
+        }, { passive: false });
+    </script>
+</body>
+</html>

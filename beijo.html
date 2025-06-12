@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Um Pedido Especial</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            color: white;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .btn-kiss {
+            background-color: #2ed573;
+            color: white;
+            border: none;
+            padding: 18px 32px;
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            cursor: pointer;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 250px;
+            display: inline-block;
+        }
+        .btn-run {
+            background-color: #ff4757;
+            color: white;
+            border: none;
+            padding: 18px 32px;
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            cursor: pointer;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: absolute;
+            width: 100%;
+            max-width: 250px;
+            touch-action: manipulation;
+        }
+        .btn-kiss:hover, .btn-run:hover {
+            transform: scale(1.05);
+        }
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            color: rgba(255, 105, 180, 0.7);
+            animation: fall 10s linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+        .message {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            animation: pulseText 2s infinite;
+            padding: 0 15px;
+        }
+        @keyframes pulseText {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Melhorias para mobile */
+        @media (max-width: 600px) {
+            .message {
+                font-size: 1.3rem;
+                margin-bottom: 25px;
+            }
+            .btn-kiss, .btn-run {
+                padding: 16px 24px;
+                font-size: 1.1rem;
+                max-width: 220px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .message {
+                font-size: 1.2rem;
+            }
+            .btn-kiss, .btn-run {
+                padding: 14px 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hearts" id="hearts"></div>
+    
+    <div class="container">
+        <div class="message">Posso te dar beijinhos?</div>
+        
+        <button class="btn-kiss" id="btnYes">
+            <i class="fas fa-kiss-wink-heart"></i> CLARO!
+        </button>
+        
+        <button class="btn-run" id="btnNo">
+            <i class="fas fa-running"></i> NÃO!
+        </button>
+    </div>
+
+    <script>
+        // Corações animados
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartCount = window.innerWidth < 600 ? 15 : 20;
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤';
+                heart.classList.add('heart');
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = 5 + Math.random() * 10 + 's';
+                heart.style.fontSize = (10 + Math.random() * 20) * (window.innerWidth < 600 ? 0.8 : 1) + 'px';
+                heart.style.opacity = Math.random() * 0.7 + 0.3;
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heartsContainer.appendChild(heart);
+            }
+        }
+        
+        // Botão que foge - versão mobile
+        const btnNo = document.getElementById('btnNo');
+        const btnYes = document.getElementById('btnYes');
+        let isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        function moveButton() {
+            // Posição aleatória na tela com limites para não sair da tela
+            const maxX = window.innerWidth - btnNo.offsetWidth;
+            const maxY = window.innerHeight - btnNo.offsetHeight;
+            
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+            
+            btnNo.style.left = x + 'px';
+            btnNo.style.top = y + 'px';
+        }
+        
+        if (isMobile) {
+            // Para mobile, movemos o botão quando o usuário tenta clicar
+            btnNo.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                moveButton();
+            });
+            
+            // Também movemos quando o dedo passa por cima
+            btnNo.addEventListener('touchmove', function(e) {
+                e.preventDefault();
+                moveButton();
+            });
+        } else {
+            // Para desktop, mantemos o comportamento original
+            btnNo.addEventListener('mouseover', moveButton);
+        }
+        
+        btnYes.addEventListener('click', function() {
+            alert("💋 te amo meu bem!");
+        });
+        
+        // Para mobile, aumentamos a área de toque do botão Sim
+        if (isMobile) {
+            btnYes.style.padding = "20px 32px";
+        }
+        
+        // Inicialização
+        window.onload = function() {
+            createHearts();
+            moveButton(); // Posição inicial do botão NÃO
+        };
+        
+        // Redimensionamento da tela
+        window.addEventListener('resize', function() {
+            moveButton();
+        });
+    </script>
+</body>
+</html>
